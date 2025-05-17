@@ -8,6 +8,7 @@ import JsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 import { registerAutoCompleteHTMLTag } from './extensions/autocomplete-html-tag.js'
 import { initEditorHotKeys } from './extensions/editor-hotkeys.js'
 import { CodiEditorStyles } from './CodiEditor.styles.js'
+import registerCodeCompletion from './extensions/register-code-completions.js'
 
 const iconUrls = {
   css: new URL('../../../assets/css.svg', import.meta.url),
@@ -52,6 +53,19 @@ export class CodiEditor extends LitElement {
       ...options
     })
     initEditorHotKeys(this.editor)
+
+    const codeCompletion = registerCodeCompletion({ monaco, editor: this.editor, language: this.language })
+
+    // Handle browser close
+    window.addEventListener('beforeunload', () => {
+      codeCompletion.deregister()
+    })
+
+    // Handle component removal
+    this.disconnectedCallback = () => {
+      codeCompletion.deregister()
+    }
+
     return this.editor
   }
 
