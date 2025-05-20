@@ -81,7 +81,6 @@ export class CodiEditor extends LitElement {
           }
         }
       }
-
       emmetHTML(monaco)
       registerAutoCompleteHTMLTag(monaco)
       this.editorInitialized = true

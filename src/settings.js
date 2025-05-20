@@ -1,4 +1,5 @@
 import { getState } from './state.js'
+import { loadThemeOptions } from './theme-loader.js'
 import { $, setFormControlValue } from './utils/dom.js'
 
 const ELEMENT_TYPES = {
@@ -37,6 +38,10 @@ Array.from($settingsForm.elements).forEach((el) => {
 
   // Reflect the initial configuration in the settings section.
   setFormControlValue(el, actualSettingValue)
+})
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadThemeOptions().catch(err => console.error('Failed to load theme options:', err))
 })
 
 function updateSettingValue ({ target }) {
