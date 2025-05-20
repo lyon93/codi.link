@@ -33,6 +33,7 @@
     "js-base64": "3.7.7",
     "lit": "3.3.0",
     "monaco-editor": "0.52.2",
+    "monaco-themes": "^0.4.5",
     "monacopilot": "^1.1.23",
     "preact": "10.26.5",
     "preact-custom-element": "4.3.0",
