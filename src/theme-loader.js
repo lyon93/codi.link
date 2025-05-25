@@ -1,5 +1,17 @@
+import { getState } from './state.js'
 import { $ } from './utils/dom.js'
 import * as monaco from 'monaco-editor'
+
+const CSS_VARIABLE_MAPPINGS = {
+  'editor.foreground': ['--app-foreground', '--aside-bar-foreground', '--input-foreground'],
+  'editor.background': ['--app-background', '--grid-background', '--gutter-background', '--aside-sections-background', '--input-background', '--aside-bar-background'],
+  'editor.selectionBackground': '--editor-selection-background',
+  'editor.lineHighlightBackground': '--editor-line-highlight-background',
+  'editorCursor.foreground': '--editor-cursor-foreground',
+  'editorWhitespace.foreground': '--editor-whitespace-foreground',
+  'editorIndentGuide.activeBackground': '--editor-indent-guide-active-background',
+  'editor.selectionHighlightBorder': '--editor-selection-highlight-border'
+}
 
 /**
  * Load the theme select dropdown with custom themes from themelist.json
@@ -38,6 +50,8 @@ export const loadThemeOptions = async () => {
 
     // Add the option group to the select dropdown
     themeSelect.appendChild(customThemesGroup)
+    // select the current theme from state
+    themeSelect.value = getState().theme
   } catch (error) {
     console.error('Error loading theme options:', error)
   }
@@ -59,6 +73,24 @@ export const loadCustomTheme = async (themeId) => {
 
     // Parse the theme data
     const themeData = await response.json()
+
+    if (themeData.colors) {
+      const root = document.documentElement
+
+      // Apply each color that exists in the theme
+      Object.entries(CSS_VARIABLE_MAPPINGS).forEach(([themeKey, cssVars]) => {
+        if (themeData.colors[themeKey]) {
+          // Handle both single values and arrays
+          if (Array.isArray(cssVars)) {
+            cssVars.forEach(cssVar => {
+              root.style.setProperty(cssVar, themeData.colors[themeKey])
+            })
+          } else {
+            root.style.setProperty(cssVars, themeData.colors[themeKey])
+          }
+        }
+      })
+    }
 
     // Define theme in Monaco
     monaco.editor.defineTheme(themeId, themeData)

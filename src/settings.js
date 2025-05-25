@@ -23,6 +23,10 @@ $settingsForm.addEventListener('submit', e => e.preventDefault())
 $settingsForm.addEventListener('input', updateSettingValue)
 $settingsForm.addEventListener('change', updateSettingValue)
 
+document.addEventListener('DOMContentLoaded', () => {
+  loadThemeOptions().catch(err => console.error('Failed to load theme options:', err))
+})
+
 Array.from($settingsForm.elements).forEach((el) => {
   const { name: settingKey, value } = el
 
@@ -38,10 +42,6 @@ Array.from($settingsForm.elements).forEach((el) => {
 
   // Reflect the initial configuration in the settings section.
   setFormControlValue(el, actualSettingValue)
-})
-
-document.addEventListener('DOMContentLoaded', () => {
-  loadThemeOptions().catch(err => console.error('Failed to load theme options:', err))
 })
 
 function updateSettingValue ({ target }) {
