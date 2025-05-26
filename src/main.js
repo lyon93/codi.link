@@ -80,7 +80,7 @@ const debouncedUpdateHash = debounce(
   MS_UPDATE_HASH_DEBOUNCED_TIME
 )
 
-const { html: htmlEditor, css: cssEditor, javascript: jsEditor } = EDITORS
+export const { html: htmlEditor, css: cssEditor, javascript: jsEditor } = EDITORS
 
 if (saveLocalstorage) {
   setHistory(history)
