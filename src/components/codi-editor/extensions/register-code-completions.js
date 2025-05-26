@@ -4,9 +4,33 @@ import { registerCompletion } from 'monacopilot'
 let activeEditorId = null
 let activeCompletion = null
 
+// Create a combined object to hold editor references and file names by language
+const editorsByLanguage = {
+  html: {
+    editor: null,
+    fileName: 'index.html'
+  },
+  css: {
+    editor: null,
+    fileName: 'style.css'
+  },
+  javascript: {
+    editor: null,
+    fileName: 'index.js'
+  }
+}
+
+const registerEditorInstance = (language, editor) => {
+  if (editorsByLanguage[language]) {
+    editorsByLanguage[language].editor = editor
+  }
+}
+
 const registerCodeCompletion = ({ monaco, editor, language }) => {
+  // Register this editor in our registry
+  registerEditorInstance(language, editor)
+
   // Generate or get a unique ID for this editor
-  // Monaco editor has a built-in ID or we can generate one
   const editorId = editor.getId()
 
   // Create focus handler
@@ -27,8 +51,18 @@ const registerCodeCompletion = ({ monaco, editor, language }) => {
 
       // Register with current editor
       activeEditorId = editorId
+
       try {
+        // Get related files by accessing the editors directly
+        const relatedFiles = Object.entries(editorsByLanguage)
+          .filter(([lang]) => lang !== language) // Filter out current language
+          .map(([lang, { editor: ed, fileName }]) => ({
+            path: fileName,
+            content: ed ? ed.getValue() : ''
+          }))
+
         activeCompletion = registerCompletion(monaco, editor, {
+          relatedFiles,
           language,
           endpoint: import.meta.env.VITE_COPILOT_COMPLETION_API
         })
@@ -45,7 +79,7 @@ const registerCodeCompletion = ({ monaco, editor, language }) => {
     try {
       activeCompletion = registerCompletion(monaco, editor, {
         language,
-        endpoint: 'http://localhost:3001/api/completions'
+        endpoint: import.meta.env.VITE_COPILOT_COMPLETION_API
       })
     } catch (e) {
       console.warn('Error registering initial completion:', e)
